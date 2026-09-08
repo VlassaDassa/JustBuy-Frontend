@@ -49,7 +49,29 @@ const ProductCard = observer(({
     const defaultMobileLike = 'products__icon products__icon-small products__icon-like'
     const activeMobileLike = 'products__icon products__icon-small products__icon-like active'
 
-    const [like, setLike] = useState([]);
+    
+    const getLikesStorageKey = () => {
+        const userId = localStorage.getItem('user_id');
+        return userId ? `justbuy_likes_${userId}` : null;
+    };
+
+    const readLikes = () => {
+        const key = getLikesStorageKey();
+
+        if (!key) {
+            return [];
+        }
+
+        try {
+            const value = JSON.parse(localStorage.getItem(key) || '[]');
+            return Array.isArray(value) ? value : [];
+        }
+        catch {
+            return [];
+        }
+    };
+
+    const [like, setLike] = useState(readLikes);
 
     function toggleAuth() {
         authForm.toggleShow()
@@ -159,18 +181,23 @@ const ProductCard = observer(({
 
 
     const addToLike = () => {
-        if (!localStorage.getItem('user_id')) {
+        const key = getLikesStorageKey();
+
+        if (!key) {
             toggleAuth();
             return;
         }
 
-        if (like.includes(product_id)) {
-            setLike(like.filter(item => item !== product_id));
-        }
-        else {
-            setLike([...like, product_id]);
-        }
-    }
+        setLike(currentLikes => {
+            const nextLikes = currentLikes.includes(product_id)
+                ? currentLikes.filter(item => item !== product_id)
+                : [...currentLikes, product_id];
+
+            localStorage.setItem(key, JSON.stringify(nextLikes));
+
+            return nextLikes;
+        });
+    };
 
     return (
         <div className={onRoad ? "products__item products__item--onRoad" : 'products__item'}>
