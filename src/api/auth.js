@@ -29,5 +29,5 @@ export function logoutUser(refreshToken) {
 
 // Refresh access token
 export function refreshToken(refreshToken) {
-    return axios.post(API_ROUTES.auth.refreshToken, { refresh: refreshToken })
+    return axios.post(API_ROUTES.auth.refreshToken, { refresh_token: refreshToken })
 }

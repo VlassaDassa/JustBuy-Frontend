@@ -14,8 +14,6 @@ import mobileMap from '../../../store/mobileMap';
 import overlay from '../../../store/overlay';
 import { updateTokens } from '../../../services/services';
 
-import { MAP_API } from '../../../secrets';
-
 import './index.scss';
 
 
@@ -79,7 +77,11 @@ const CurrentMap = observer(({ owners, address, coordX, coordY, deliveryPointId 
 
         <div id="map">
             <Loader additionalClass='mapLoader' />
-            <YMaps query={{ apikey: MAP_API }}>
+           <YMaps
+                query={{
+                    apikey: process.env.REACT_APP_YANDEX_MAPS_API_KEY,
+                }}
+            >
                 <Map className="map" defaultState={{ center: [coordX, coordY], zoom: 15 }}>
                   <Placemark
                       key={'placemark'}

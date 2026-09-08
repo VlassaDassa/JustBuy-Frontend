@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { addCartProduct, removeCartProductFromProdId, getSizesAndColors } from './../../../api/cartAPI'
@@ -52,6 +52,7 @@ const ProductCard = observer(({
     
     const getLikesStorageKey = () => {
         const userId = localStorage.getItem('user_id');
+
         return userId ? `justbuy_likes_${userId}` : null;
     };
 
@@ -64,6 +65,7 @@ const ProductCard = observer(({
 
         try {
             const value = JSON.parse(localStorage.getItem(key) || '[]');
+
             return Array.isArray(value) ? value : [];
         }
         catch {
@@ -71,7 +73,13 @@ const ProductCard = observer(({
         }
     };
 
-    const [like, setLike] = useState(readLikes);
+    const [isLiked, setIsLiked] = useState(() => {
+        return readLikes().includes(product_id);
+    });
+
+    useEffect(() => {
+        setIsLiked(readLikes().includes(product_id));
+    }, [product_id]);
 
     function toggleAuth() {
         authForm.toggleShow()
@@ -188,15 +196,15 @@ const ProductCard = observer(({
             return;
         }
 
-        setLike(currentLikes => {
-            const nextLikes = currentLikes.includes(product_id)
-                ? currentLikes.filter(item => item !== product_id)
-                : [...currentLikes, product_id];
+        const currentLikes = readLikes();
+        const liked = currentLikes.includes(product_id);
 
-            localStorage.setItem(key, JSON.stringify(nextLikes));
+        const nextLikes = liked
+            ? currentLikes.filter(id => id !== product_id)
+            : [...currentLikes, product_id];
 
-            return nextLikes;
-        });
+        localStorage.setItem(key, JSON.stringify(nextLikes));
+        setIsLiked(!liked);
     };
 
     return (
@@ -212,8 +220,8 @@ const ProductCard = observer(({
 
                     {likeShow &&
                         <img 
-                            src={like.includes(product_id) ? heartFill: heart} 
-                            className={like.includes(product_id) ? defaultLikeClass: activeLikeClass}
+                            src={isLiked ? heartFill: heart} 
+                            className={isLiked ? defaultLikeClass: activeLikeClass}
                             onClick={addToLike}
                         />
                     }
@@ -274,8 +282,8 @@ const ProductCard = observer(({
                         </button>
                         
                         <img 
-                            className={like.includes(product_id) ? activeMobileLike : defaultMobileLike}
-                            src={like.includes(product_id) ? heartFill: heart} 
+                            className={isLiked ? activeMobileLike : defaultMobileLike}
+                            src={isLiked ? heartFill: heart} 
                             onClick={addToLike}
                         />
                         
