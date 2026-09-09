@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://192.168.0.118:8000/api/';
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://127.0.0.1:8000/api/';
 
 
 export const API_ROUTES = {
@@ -40,7 +40,7 @@ export const API_ROUTES = {
         getUserPurchases: API_BASE_URL + 'get_user_purchases/',
         getUserOnRoad: API_BASE_URL + 'get_user_on_road/',
 
-        getCoordinatesCity: 'https://geocode-maps.yandex.ru/1.x/',
+        getCoordinatesCity: API_BASE_URL + 'geocode_city/',
     },
 
     cart: {

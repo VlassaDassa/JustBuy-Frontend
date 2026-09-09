@@ -2,8 +2,6 @@ import axios from 'axios';
 
 import { API_ROUTES } from './apiConfig';
 
-import { YMAP_API } from '../secrets';
-
 
 
 // Receiving all delivery points
@@ -94,7 +92,10 @@ export const getUserBankCards = (user_id) => {
 
 // Получение координат города по названию
 export const getCoordinatesCity = (city) => {
-    return axios.get(API_ROUTES.profile.getCoordinatesCity + '?apikey=' + YMAP_API + '&geocode=' + city + '&format=json')
-}; 
-
+    return axios.get(API_ROUTES.profile.getCoordinatesCity, {
+        params: {
+            city,
+        },
+    });
+};
 

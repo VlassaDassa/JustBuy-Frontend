@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { addCartProduct, removeCartProductFromProdId, getSizesAndColors } from './../../../api/cartAPI'
@@ -49,7 +49,37 @@ const ProductCard = observer(({
     const defaultMobileLike = 'products__icon products__icon-small products__icon-like'
     const activeMobileLike = 'products__icon products__icon-small products__icon-like active'
 
-    const [like, setLike] = useState([]);
+    
+    const getLikesStorageKey = () => {
+        const userId = localStorage.getItem('user_id');
+
+        return userId ? `justbuy_likes_${userId}` : null;
+    };
+
+    const readLikes = () => {
+        const key = getLikesStorageKey();
+
+        if (!key) {
+            return [];
+        }
+
+        try {
+            const value = JSON.parse(localStorage.getItem(key) || '[]');
+
+            return Array.isArray(value) ? value : [];
+        }
+        catch {
+            return [];
+        }
+    };
+
+    const [isLiked, setIsLiked] = useState(() => {
+        return readLikes().includes(product_id);
+    });
+
+    useEffect(() => {
+        setIsLiked(readLikes().includes(product_id));
+    }, [product_id]);
 
     function toggleAuth() {
         authForm.toggleShow()
@@ -159,18 +189,23 @@ const ProductCard = observer(({
 
 
     const addToLike = () => {
-        if (!localStorage.getItem('user_id')) {
+        const key = getLikesStorageKey();
+
+        if (!key) {
             toggleAuth();
             return;
         }
 
-        if (like.includes(product_id)) {
-            setLike(like.filter(item => item !== product_id));
-        }
-        else {
-            setLike([...like, product_id]);
-        }
-    }
+        const currentLikes = readLikes();
+        const liked = currentLikes.includes(product_id);
+
+        const nextLikes = liked
+            ? currentLikes.filter(id => id !== product_id)
+            : [...currentLikes, product_id];
+
+        localStorage.setItem(key, JSON.stringify(nextLikes));
+        setIsLiked(!liked);
+    };
 
     return (
         <div className={onRoad ? "products__item products__item--onRoad" : 'products__item'}>
@@ -185,8 +220,8 @@ const ProductCard = observer(({
 
                     {likeShow &&
                         <img 
-                            src={like.includes(product_id) ? heartFill: heart} 
-                            className={like.includes(product_id) ? defaultLikeClass: activeLikeClass}
+                            src={isLiked ? heartFill: heart} 
+                            className={isLiked ? defaultLikeClass: activeLikeClass}
                             onClick={addToLike}
                         />
                     }
@@ -247,8 +282,8 @@ const ProductCard = observer(({
                         </button>
                         
                         <img 
-                            className={like.includes(product_id) ? activeMobileLike : defaultMobileLike}
-                            src={like.includes(product_id) ? heartFill: heart} 
+                            className={isLiked ? activeMobileLike : defaultMobileLike}
+                            src={isLiked ? heartFill: heart} 
                             onClick={addToLike}
                         />
                         

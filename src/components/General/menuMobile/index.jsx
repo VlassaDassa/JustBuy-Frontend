@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { Link } from 'react-router-dom';
 
 import { getMenu, getMenuSubcategories } from '../../../api/generalAPI';
 import { logoutUser } from '../../../api/auth';
-import { showError } from '../../../hooks/showError';
 import useRequest from '../../../hooks/useRequest';
 import auth from '../../../store/authForm';
 import overlay from '../../../store/overlay';
-import { updateTokens } from '../../../services/services';
 import mobileMenu from '../../../store/mobileMenu';
 import noScroll from '../../../store/noScroll';
 
@@ -58,28 +56,22 @@ const MenuMobile = observer(() => {
         noScroll.toggleScroll(true)
     }
 
-    const handleLogOut = () => {
-        logoutUser(localStorage.getItem('refreshToken'))
-        .then(response => {
-            if (response.status != 200) {
-                showError('Неизвестная ошибка')
-            }
+    const handleLogout = async () => {
+        const refreshToken = localStorage.getItem('refresh_token');
 
+        try {
+            if (refreshToken) {
+                await logoutUser(refreshToken);
+            }
+        }
+        finally {
             localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user_id');
-            localStorage.removeItem('username');
 
-            window.location.href = "/"
-        })
-        .catch(error => {
-            // Обновление refresh Token при истечении годности AccessToken
-            if (error?.response?.status == 401) updateTokens()
-
-            console.error('Error: ', error)
-            showError('Неизвестная ошибка')
-        })
-    }
+            window.location.href = '/';
+        }
+    };
 
 
 
@@ -113,7 +105,7 @@ const MenuMobile = observer(() => {
 
                         {
                             localStorage.getItem('user_id') ?
-                                <li className="mobile_menu-item mobile_menu-logout"><img src={logoutIco} className='logoutIcoMobile' onClick={handleLogOut} /></li>
+                                <li className="mobile_menu-item mobile_menu-logout"><img src={logoutIco} className='logoutIcoMobile' onClick={handleLogout} /></li>
                             :
                                 null
                         }

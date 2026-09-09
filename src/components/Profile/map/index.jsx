@@ -1,5 +1,4 @@
-import React, { useState, useEffect, memo, useCallback } from 'react';
-import { MAP_API } from '../../../secrets';
+import { useState, useEffect, memo, useCallback } from 'react';
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
 import { observer } from 'mobx-react-lite';
 
@@ -46,7 +45,12 @@ const YandexMap = observer(({ coord }) => {
         
         <Loader additionalClass='mapLoader'/>
 
-        <YMaps key={currentCoord.join(',')} query={{ apikey: MAP_API }}>
+        <YMaps
+            key={currentCoord.join(',')}
+            query={{
+                apikey: process.env.REACT_APP_YANDEX_MAPS_API_KEY,
+            }}
+        >
           <Map className="map" defaultState={{ center: currentCoord, zoom: 15 }}>
             {points &&
               points.map((point) => (

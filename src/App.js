@@ -18,6 +18,7 @@ import MobileSearchBar from './components/General/mobileSearchBar';
 import MenuMobile from './components/General/menuMobile';
 import noScroll from './store/noScroll';
 import GlobalLoader from './components/General/globalLoader';
+import DemoBanner from './components/General/demoBanner';
 
 import critical_error from './store/critical_error';
 import { updateLocalStorage } from './services/services';
@@ -34,7 +35,6 @@ import './../src/assets/styles/index.scss'
 
 const App = observer(() => {
   const [hiddenGlobalLoader, setHiddenGlobalLoader] = useState(false)
-  const [show, setShow] = useState(false)
 
   if (noScroll.scroll) {
     document.body.classList.remove('no-scroll')
@@ -89,6 +89,8 @@ const App = observer(() => {
       </CSSTransition>
 
       <Header />
+      <DemoBanner />
+      
 
       <MobileSearchBar />
 
